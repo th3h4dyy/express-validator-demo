@@ -1,0 +1,16 @@
+طيب هنجاوب ع السؤالين:
+
+- Does Sequelize escape malicious code by default?
+ف الوضع الطبيعي بدون اي raw query بيعمل كده ايوه لحد ما تبدأ تستخدم اي نوع من ال raw queries ف لا.
+
+- what is the impact of sanitizing string input, does the user will not be able to enter some values?
+
+ف هنا الأول لازم نجاوب ع سؤال
+- what is the difference between validation and sanitization?
+طيب ال validation هو بيتأكد إن ال input بتاعك بي meet بعض ال criteria زي مثلا لو عندك انبوت المفروض يكون string وانت بتدخله number مثلا، ف هنا هتمنع اليوزر انه يعمل كده
+
+ال sanitization هو بياخد ال input بتاعك وبيبدأ ي modify عليه، ف المثال بتاعنا لو انا دخلت input معين ف ال first name زي:
+ahmed' or 1=1-- (this is a malicious sql query)
+هيروح يعمل escape لل charchters دي ويخليه HTML entites ودي مش هتأثر تماما ع ال query ومش هتؤدي ل SQL Injection
+
+وخليته بعدها يشيل ال html entities علشان ال insertion جوا ال database + لما اجي أ retrieve ال data بعد كده تبقى ف شكلها ال raw الطبيعي.
