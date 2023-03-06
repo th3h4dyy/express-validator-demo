@@ -8,14 +8,18 @@ const sequelize = new Sequelize({
   host: 'localhost',
   port: 5432,
   username: 'postgres',
-  password: '#local0x#',
+  password: 'lol0x',
   database: 'postgres',
 });
 
 const User = sequelize.define(
   'User',
   {
-    firstName: {
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -53,6 +57,27 @@ app.post(
 app.get('/info', async (req, res) => {
   const users = await User.findAll();
   res.send({ users });
+});
+
+app.post('/login', async (req, res) => {
+  await User.sync({ force: true });
+  await User.create({ username: 'admin', password: 'test123' });
+  const { username, password } = req.body;
+  /**
+   * my malicious query
+   * {
+      "username": "admin",
+      "password": "' or 1=1--"
+      }
+   */
+  const result = await sequelize.query(
+    `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`
+  );
+
+  if (result[0].length === 0) {
+    return res.status(401).send();
+  }
+  res.status(200).send({ result: result[0] });
 });
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
